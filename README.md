@@ -197,16 +197,16 @@ All containers provide as further binaries:
 
 ### Building your own CP2K docker container
 
-You can build your own CP2K docker container, e.g. using the Docker file `Dockerfile.2023.2_mpich_generic_psmp` for the CP2K version 2023.2, by running
+You can build your own CP2K docker container, e.g. using the Docker file `2023.2_mpich_generic_psmp.Dockerfile` for the CP2K version 2023.2, by running
 
 ```
-docker build -f ./Dockerfile.2023.2_mpich_generic_psmp -t $USER/cp2k:2023.2_mpich_generic_psmp .
+docker build -f ./2023.2_mpich_generic_psmp.Dockerfile -t $USER/cp2k:2023.2_mpich_generic_psmp .
 ```
 
 or for the current CP2K trunk version (see [master](https://github.com/cp2k/cp2k/tree/master) branch) with
 
 ```
-docker build -f ./Dockerfile.master_mpich_generic_psmp -t cp2k/cp2k:master$(date +%Y%m%d)_mpich_generic_psmp .
+docker build -f ./master_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:master$(date +%Y%m%d)_mpich_generic_psmp .
 ```
 
 Each Docker file includes a `Usage` line in its header with the `docker build` command to run that file.
@@ -214,13 +214,13 @@ Each Docker file includes a `Usage` line in its header with the `docker build` c
 If the docker files will include any CP2K regression test during its build, the log file size will be much larger. In that case, it is recommended either to use docker's legacy builder
 
 ```
-DOCKER_BUILDKIT=0 docker build -f ./Dockerfile.2023.2_mpich_generic_psmp -t cp2k/cp2k:2023.2_mpich_generic_psmp .
+DOCKER_BUILDKIT=0 docker build -f ./2023.2_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:2023.2_mpich_generic_psmp .
 ```
 
 or to add the `--progress` flag when using the new docker builder `buildx`, e.g.
 
 ```
-docker buildx build --progress=plain -f ./Dockerfile.2023.2_mpich_generic_psmp -t cp2k/cp2k:2023.2_mpich_generic_psmp .
+docker buildx build --progress=plain -f ./2023.2_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:2023.2_mpich_generic_psmp .
 ```
 
 ### (Re-)Generate the docker files
