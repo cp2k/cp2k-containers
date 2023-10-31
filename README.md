@@ -1,4 +1,4 @@
-# CP2K docker containers
+# CP2K containers
 
 CP2K docker containers are suited for many host systems. A convenient way to use them is to run such a container with [Apptainer](https://apptainer.org/) which is described in the following sections. Further down, you will find the information how to run and build CP2K production containers with [docker](https://docs.docker.com/).
 
