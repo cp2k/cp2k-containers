@@ -12,7 +12,7 @@ Install the latest [Apptainer](https://apptainer.org/) version as described [her
 
 ### Download a pre-built CP2K docker container with Apptainer
 
-The available pre-built CP2K production docker containers can be found [here](https://hub.docker.com/r/cp2k/cp2k/tags/). The name of a docker container indicates CP2K version, MPI implementation (MPICH or OpenMPI), target CPU (`generic`, `haswell`, or `skylake-avx512`), CUDA support, and cp2k binary version (e.g. `psmp` for MPI parallelized with OpenMP support). If you don't know your CPU model, then try the CPU target `generic` (NEHALEM) first or simply choose `latest`::
+The available pre-built CP2K production docker containers can be found [here](https://hub.docker.com/r/cp2k/cp2k/tags/). The name of a docker container indicates CP2K version, MPI implementation (MPICH or OpenMPI), target CPU (`generic`, `haswell`, or `skylake-avx512`), CUDA support, and cp2k binary version (e.g. `psmp` for MPI parallelized with OpenMP support). If you don't know your CPU model, then try the CPU target `generic` (NEHALEM) first or simply choose `latest`:
 
 ```
 apptainer pull docker://cp2k/cp2k:latest
