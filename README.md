@@ -157,7 +157,7 @@ This test should not give any error messages. A more extensive testing can be pe
 docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:latest run_tests
 ```
 
-The flag `-it` keeps the interactive terminal attached which allows for an interrupt of the run with `Ctrl-C`. The `--rm` flag removes automatically the created container when it exits.
+The flag `-it` keeps the interactive terminal attached which allows for an interrupt of the run with `Ctrl-C`. The `--rm` flag removes automatically the created container when it exits. Furthermore, the `--shm-size=1g` flag is needed to increase the shared memory size for the MPI inter-process communication.
 
 ### Running MPI within the container
 
