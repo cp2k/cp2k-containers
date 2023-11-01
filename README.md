@@ -227,7 +227,7 @@ docker buildx build --progress=plain -f ./2023.2_mpich_generic_psmp.Dockerfile -
 
 ### (Re-)Generate the docker files
 
-The Python script [`generate_docker_files`](https://github.com/cp2k/cp2k-containers/blob/master/docker/generate_docker_files.py) generates all docker files in this [folder](https://github.com/cp2k/cp2k/tree/master/tools/docker/production/) if run without any further option. It provides a few command line options allowing for an adaptation of the created docker files to the actual needs, e.g. with
+The Python script [`generate_docker_files`](https://github.com/cp2k/cp2k-containers/blob/master/docker/generate_docker_files.py) generates all docker files in this [folder](https://github.com/cp2k/cp2k-containers/tree/master/docker/) if run without any further option. It provides a few command line options allowing for an adaptation of the created docker files to the actual needs, e.g. with
 
 ```
 ./generate_docker_files.py -j 28 --test
