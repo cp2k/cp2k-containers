@@ -52,7 +52,7 @@ A more extensive testing, a kind of self-test, can be performed with the `run_te
 apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests
 ```
 
-which launches a full [CP2K regression test](https://www.cp2k.org/dev:regtesting/) run within the container. The test run will use 8 tasks (CPU cores) by default. If you have more or less CPU cores available, you can select any multiple of 4, e.g,
+which launches a full [CP2K regression test](https://www.cp2k.org/dev:regtesting/) run within the container. The test run will use 8 tasks (CPU cores) by default. If you have more or less CPU cores available, you can set the maximum number of tasks (CPU cores), preferibly a multiple of 4 for this test, with the `--maxtasks` flag
 
 ```
 apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests --maxtasks 32
