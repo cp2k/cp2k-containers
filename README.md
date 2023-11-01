@@ -12,48 +12,50 @@ Install the latest [Apptainer](https://apptainer.org/) version as described [her
 
 ### Download a pre-built CP2K docker container with Apptainer
 
-The available pre-built CP2K production docker containers can be found [here](https://hub.docker.com/repository/docker/mkrack/cp2k/tags?page=1&ordering=last_updated). The name of a docker container indicates CP2K version, MPI implementation (MPICH or OpenMPI), target CPU (`generic`, `haswell`, or `skylake-avx512`), CUDA support, and cp2k binary version (e.g. `psmp` for MPI parallelized with OpenMP support). If you don't know your CPU model, then try the CPU target `generic` (NEHALEM) first:
+The available pre-built CP2K production docker containers can be found [here](https://hub.docker.com/r/cp2k/cp2k/tags/). The name of a docker container indicates CP2K version, MPI implementation (MPICH or OpenMPI), target CPU (`generic`, `haswell`, or `skylake-avx512`), CUDA support, and cp2k binary version (e.g. `psmp` for MPI parallelized with OpenMP support). If you don't know your CPU model, then try the CPU target `generic` (NEHALEM) first or simply choose `latest`::
 
 ```
-apptainer pull docker://mkrack/cp2k:2023.2_mpich_generic_psmp
+apptainer pull docker://cp2k/cp2k:latest
 ```
+
+which will download the `mpich_generic_psmp` image of the latest CP2K release version. 
 
 ### Run CP2K with Apptainer
 
 Check if the pre-built container runs on your system with
 
 ```
-apptainer run cp2k_2023.2_mpich_generic_psmp.sif cp2k -h -v
+apptainer run cp2k_latest.sif cp2k -h -v
 ```
 
 or simply
 
 ```
-cp2k_2023.2_mpich_generic_psmp.sif
+cp2k_latest.sif
 ```
 
 should work as well, if the `.sif` file is executable. This test should not give any error messages. A warning like `setlocale: LC_ALL: cannot change locale` will disappear when `LC_ALL=C` is set in advance:
 
 ```
-LC_ALL=C cp2k_2023.2_mpich_generic_psmp.sif cp2k
+LC_ALL=C cp2k_latest.sif cp2k
 ```
 
 If the `.sif` is not executable, then you can use the command `chmod a+x` to make it executable:
 
 ```
-chmod a+x cp2k_2023.2_mpich_generic_psmp.sif
+chmod a+x cp2k_latest.sif
 ```
 
 A more extensive testing, a kind of self-test, can be performed with the `run_tests` command
 
 ```
-apptainer run -B $PWD:/mnt cp2k_2023.2_mpich_generic_psmp.sif run_tests
+apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests
 ```
 
 which launches a full [CP2K regression test](https://www.cp2k.org/dev:regtesting/) run within the container. The test run will use 8 tasks (CPU cores) by default. If you have more or less CPU cores available, you can select any multiple of 4, e.g,
 
 ```
-apptainer run -B $PWD:/mnt cp2k_2023.2_mpich_generic_psmp.sif run_tests --maxtasks 32
+apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests --maxtasks 32
 ```
 
 ### Running CUDA enabled containers with Apptainer
@@ -61,7 +63,7 @@ apptainer run -B $PWD:/mnt cp2k_2023.2_mpich_generic_psmp.sif run_tests --maxtas
 CUDA enabled containers can be employed on host systems which provide also NVIDIA GPU resources. Pull a CUDA enabled CP2K docker container matching the GPU type of your system, e.g. for Pascal GPUs (P100)
 
 ```
-apptainer pull docker://mkrack/cp2k:2023.2_mpich_generic_cuda_P100_psmp
+apptainer pull docker://cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp
 ```
 
 Run the container with the `--nv` flag using the `nvidia-smi` command from the container
@@ -120,7 +122,7 @@ With SLURM, `srun` is usually the proper way to launch a production run in batch
 The containers provide also various CP2K tools like `dumpdcd`, `graph`, and `xyz2dcd`. Run
 
 ```
-cp2k_2023.2_mpich_generic_psmp.sif dumpdcd -h
+cp2k_latest.sif dumpdcd -h
 ```
 
 for more information and [see below](#further-binaries).
@@ -133,26 +135,26 @@ Install the latest [docker](https://docs.docker.com/get-docker/) version on the 
 
 ### Download of pre-built CP2K containers with docker
 
-Pre-built CP2K docker containers can also be downloaded from [Dockerhub](https://hub.docker.com/r/mkrack/cp2k/tags/) using docker. There are containers compiled using MPICH and OpenMPI for various target CPUs like `generic` (NEHALEM) and for the `x86_64` Intel CPUs `haswell` and `skylake-avx512` are available.
+Pre-built CP2K docker containers can also be downloaded from [Dockerhub](https://hub.docker.com/r/cp2k/cp2k/tags/) using docker. There are containers compiled using MPICH and OpenMPI for various target CPUs like `generic` (NEHALEM) and for the `x86_64` Intel CPUs `haswell` and `skylake-avx512` are available.
 
 ### Run a CP2K docker container
 
 Check if the pre-built container runs on your system using docker, e.g. with
 
 ```
-docker run -it --rm mkrack/cp2k:2023.2_mpich_generic_psmp
+docker run -it --rm cp2k/cp2k:latest
 ```
 
 or
 
 ```
-docker run -it --rm mkrack/cp2k:2023.2_mpich_generic_psmp cp2k -h -v
+docker run -it --rm cp2k/cp2k:latest cp2k -h -v
 ```
 
 This test should not give any error messages. A more extensive testing can be performed with `run_tests`
 
 ```
-docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) mkrack/cp2k:2023.2_mpich_generic_psmp run_tests
+docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:latest run_tests
 ```
 
 The flag `-it` keeps the interactive terminal attached which allows for an interrupt of the run with `Ctrl-C`. The `--rm` flag removes automatically the created container when it exits.
@@ -162,13 +164,13 @@ The flag `-it` keeps the interactive terminal attached which allows for an inter
 The MPI of the container can be employed to run CP2K within a compute node. The containers built with MPICH can be run with
 
 ```
-docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) mkrack/cp2k:2023.2_mpich_generic_psmp mpirun -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2023.2_mpich_generic_psmp mpirun -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
 ```
 
 whereas the containers built with OpenMPI can be run, e.g. using
 
 ```
-docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) mkrack/cp2k:2023.2_openmpi_generic_psmp mpirun -bind-to none -np 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2023.2_openmpi_generic_psmp mpirun -bind-to none -np 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
 ```
 
 ### Running CUDA enabled docker containers
@@ -176,11 +178,11 @@ docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) 
 After pulling a CUDA enabled CP2K docker container, e.g. for Pascal GPUs (P100), similarly to the [section above](#running-cuda-enabled-containers-with-apptainer), the following docker commands will check
 
 ```
-docker run -it --rm --gpus all mkrack/cp2k:2023.2_mpich_generic_cuda_P100_psmp nvidia-smi
+docker run -it --rm --gpus all cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp nvidia-smi
 
-docker run -it --rm --gpus all mrack/cp2k:2023.2_mpich_generic_cuda_P100_psmp nvcc --version
+docker run -it --rm --gpus all cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp nvcc --version
 
-docker run -it --rm --gpus all --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) mkrack/cp2k:2023.2_mpich_generic_cuda_P100_psmp run_tests
+docker run -it --rm --gpus all --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp run_tests
 ```
 
 if the container is working correctly.
@@ -225,7 +227,7 @@ docker buildx build --progress=plain -f ./2023.2_mpich_generic_psmp.Dockerfile -
 
 ### (Re-)Generate the docker files
 
-The Python script [`generate_docker_files`](https://github.com/cp2k/cp2k/tree/master/tools/docker/production/generate_docker_files.py) generates all docker files in this [folder](https://github.com/cp2k/cp2k/tree/master/tools/docker/production/) if run without any further option. It provides a few command line options allowing for an adaptation of the created docker files to the actual needs, e.g. with
+The Python script [`generate_docker_files`](https://github.com/cp2k/cp2k-containers/blob/master/docker/generate_docker_files.py) generates all docker files in this [folder](https://github.com/cp2k/cp2k/tree/master/tools/docker/production/) if run without any further option. It provides a few command line options allowing for an adaptation of the created docker files to the actual needs, e.g. with
 
 ```
 ./generate_docker_files.py -j 28 --test
