@@ -12,7 +12,14 @@ import os
 
 cp2k_release_list = ["master", "2023.2"]  # append new releases to list
 mpi_implementation_list = ["intelmpi", "mpich", "openmpi"]
-target_cpu_list = ["generic", "haswell", "native", "skylake-avx512", "znver2", "znver3"]
+target_cpu_list = [
+    "generic",
+    "haswell",
+    "native",
+    "skylake-avx512",
+    "znver2",
+    "znver3",
+]
 target_gpu_list = ["P100", "V100", "A100"]  # append new GPUs to list
 
 # ------------------------------------------------------------------------------
@@ -159,7 +166,9 @@ def main() -> None:
                     if float(release) <= 2023.2 and "znver" in target_cpu:
                         continue
                 name = f"{release}_{mpi_implementation}_{target_cpu}_{version}"
-                with OutputFile(f"{name}.Dockerfile", args.check) as output_file:
+                with OutputFile(
+                    f"{name}.Dockerfile", args.check
+                ) as output_file:
                     output_file.write(
                         write_docker_file(
                             base_system=base_system,
@@ -204,7 +213,9 @@ def main() -> None:
                         f"{release}_{mpi_implementation}_{target_cpu}"
                         f"_cuda_{target_gpu}_{version}"
                     )
-                    with OutputFile(f"{name}.Dockerfile", args.check) as output_file:
+                    with OutputFile(
+                        f"{name}.Dockerfile", args.check
+                    ) as output_file:
                         output_file.write(
                             write_docker_file(
                                 base_system=base_system,
@@ -229,7 +240,9 @@ def main() -> None:
 def check_ncores(value: str) -> int:
     ivalue = int(value)
     if ivalue < 1:
-        raise argparse.ArgumentTypeError(f"{value} is an invalid number of CPU cores")
+        raise argparse.ArgumentTypeError(
+            f"{value} is an invalid number of CPU cores"
+        )
     return ivalue
 
 
@@ -287,7 +300,9 @@ ENV LD_LIBRARY_PATH {cuda_path}/lib64
 # See also https://github.com/cp2k/cp2k/pull/2337
 ENV CUDA_CACHE_DISABLE 1
 """
-        with_gpu_line = f"--enable-cuda=yes --gpu-ver={target_gpu} --with-libtorch=no"
+        with_gpu_line = (
+            f"--enable-cuda=yes --gpu-ver={target_gpu} --with-libtorch=no"
+        )
     else:
         additional_exports = "\\"
         arch = "local"
@@ -458,7 +473,9 @@ class OutputFile:
         self.check = check
         self.content = io.StringIO()
         self.content.write("#\n")
-        self.content.write("# This file was created by generate_docker_files.py\n")
+        self.content.write(
+            "# This file was created by generate_docker_files.py\n"
+        )
         self.content.write("#")
 
     def __enter__(self) -> io.StringIO:
@@ -467,7 +484,10 @@ class OutputFile:
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         output_path = Path(__file__).parent / self.filename
         if self.check:
-            assert output_path.read_text(encoding="utf8") == self.content.getvalue()
+            assert (
+                output_path.read_text(encoding="utf8")
+                == self.content.getvalue()
+            )
             print(f"File {output_path} is consistent with generator script")
         else:
             output_path.write_text(self.content.getvalue(), encoding="utf8")
