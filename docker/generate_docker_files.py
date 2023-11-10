@@ -101,6 +101,14 @@ def main() -> None:
         help="Run a full regression test during the build step",
     )
     parser.add_argument(
+        "--user",
+        "--user-name",
+        default="cp2k",
+        dest="user_name",
+        help="Specify the username for GitHub and DockerHub (default is cp2k)",
+        type=str,
+    )
+    parser.add_argument(
         "--version",
         choices=version_choices,
         default=version_choices[0],
@@ -113,11 +121,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    version = args.version
     ncores = args.ncores
     no_tests = args.no_tests
     omp_stacksize = "16M"
     test_build = args.test_build
+    version = args.version
+    user_name = args.user_name
 
     if ncores > os.cpu_count():
         print(
@@ -126,14 +135,11 @@ def main() -> None:
         )
 
     for release in cp2k_release_list:
-        if args.release != "all" and args.release != release:
+        if args.release not in ("all", release):
             continue
 
         for mpi_implementation in mpi_implementation_list:
-            if (
-                args.mpi_implementation != "all"
-                and args.mpi_implementation != mpi_implementation
-            ):
+            if args.mpi_implementation not in ("all", mpi_implementation):
                 continue
 
             if mpi_implementation == "intelmpi":
@@ -145,7 +151,7 @@ def main() -> None:
                 base_system = "ubuntu:22.04"
 
             for target_cpu in target_cpu_list:
-                if args.target_cpu != "all" and args.target_cpu != target_cpu:
+                if args.target_cpu not in ("all", target_cpu):
                     continue
                 if "znver" in target_cpu and mpi_implementation == "intelmpi":
                     continue
@@ -153,9 +159,9 @@ def main() -> None:
                     if float(release) <= 2023.2 and "znver" in target_cpu:
                         continue
                 name = f"{release}_{mpi_implementation}_{target_cpu}_{version}"
-                with OutputFile(f"{name}.Dockerfile", args.check) as f:
-                    f.write(
-                        write_definition_file(
+                with OutputFile(f"{name}.Dockerfile", args.check) as output_file:
+                    output_file.write(
+                        write_docker_file(
                             base_system=base_system,
                             name=name,
                             release=release,
@@ -167,28 +173,29 @@ def main() -> None:
                             target_cpu=target_cpu,
                             target_gpu="",
                             test_build=test_build,
+                            user_name=user_name,
                         )
                     )
 
     # Generate docker files for CUDA
     base_system = "nvidia/cuda:12.2.0-devel-ubuntu22.04"
     for release in cp2k_release_list:
-        if args.release != "all" and args.release != release:
+        if args.release not in ("all", release):
             continue
         for mpi_implementation in mpi_implementation_list:
             if (
-                args.mpi_implementation != "all"
-                and args.mpi_implementation != mpi_implementation
-            ) or mpi_implementation == "intelmpi":
+                args.mpi_implementation not in ("all", mpi_implementation)
+                or mpi_implementation == "intelmpi"
+            ):
                 continue
             for target_cpu in target_cpu_list:
-                if args.target_cpu != "all" and args.target_cpu != target_cpu:
+                if args.target_cpu not in ("all", target_cpu):
                     continue
                 # Restrict docker file generation for CUDA
                 if target_cpu not in ["generic", "native", args.target_cpu]:
                     continue
                 for igpu, target_gpu in enumerate(target_gpu_list):
-                    if args.target_gpu != "all" and args.target_gpu != target_gpu:
+                    if args.target_gpu not in ("all", target_gpu):
                         continue
                     if release != "master":
                         if float(release) <= 2023.2 and igpu > 1:
@@ -197,9 +204,9 @@ def main() -> None:
                         f"{release}_{mpi_implementation}_{target_cpu}"
                         f"_cuda_{target_gpu}_{version}"
                     )
-                    with OutputFile(f"{name}.Dockerfile", args.check) as f:
-                        f.write(
-                            write_definition_file(
+                    with OutputFile(f"{name}.Dockerfile", args.check) as output_file:
+                        output_file.write(
+                            write_docker_file(
                                 base_system=base_system,
                                 name=name,
                                 release=release,
@@ -211,6 +218,7 @@ def main() -> None:
                                 target_cpu=target_cpu,
                                 target_gpu=target_gpu,
                                 test_build=test_build,
+                                user_name=user_name,
                             )
                         )
 
@@ -228,7 +236,7 @@ def check_ncores(value: str) -> int:
 # ------------------------------------------------------------------------------
 
 
-def write_definition_file(
+def write_docker_file(
     base_system: str,
     name: str,
     release: str,
@@ -240,6 +248,7 @@ def write_definition_file(
     target_cpu: str,
     target_gpu: str,
     test_build: bool,
+    user_name: str,
 ) -> str:
     do_regtest = "/opt/cp2k/tests/do_regtest.py"
 
@@ -347,7 +356,7 @@ RUN printf "{do_regtest} {testopts} \$* {arch} {version}" \
         required_packages += " python3"
 
     return rf"""
-# Usage: docker build -f ./{name}.Dockerfile -t cp2k/cp2k:{tagname} .
+# Usage: docker build -f ./{name}.Dockerfile -t {user_name}/cp2k:{tagname} .
 
 # Stage 1: build step
 FROM {base_system} AS build
@@ -359,7 +368,7 @@ RUN apt-get update -qq{permissive} && apt-get install -qq --no-install-recommend
     bzip2 ca-certificates git make patch pkg-config unzip wget zlib1g-dev
 
 # Download CP2K
-RUN git clone --recursive{branch} https://github.com/cp2k/cp2k.git /opt/cp2k
+RUN git clone --recursive{branch} https://github.com/{user_name}/cp2k.git /opt/cp2k
 
 # Build CP2K toolchain for target CPU {target_cpu}
 WORKDIR /opt/cp2k/tools/toolchain
