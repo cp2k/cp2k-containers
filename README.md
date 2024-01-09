@@ -63,25 +63,25 @@ apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests --maxtasks 32
 CUDA enabled containers can be employed on host systems which provide also NVIDIA GPU resources. Pull a CUDA enabled CP2K docker container matching the GPU type of your system, e.g. for Pascal GPUs (P100)
 
 ```
-apptainer pull docker://cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp
+apptainer pull docker://cp2k/cp2k:2024.1_mpich_generic_cuda_P100_psmp
 ```
 
 Run the container with the `--nv` flag using the `nvidia-smi` command from the container
 
 ```
-apptainer run --nv ./cp2k_2023.2_mpich_generic_cuda_P100_psmp.sif nvidia-smi
+apptainer run --nv ./cp2k_2024.1_mpich_generic_cuda_P100_psmp.sif nvidia-smi
 ```
 
 and compare its output with the ouput of the `nvidia-smi` command from the host system. These outputs should agree when the container is able to recognize the GPU resources of the host system, correctly. Check also the CUDA version of the host system shown (top right) in the output of `nvidia-smi` command. That CUDA version should match or be newer than the CUDA version installed in the container. Run the command
 
 ```
-apptainer run --nv ./cp2k_2023.2_mpich_generic_cuda_P100_psmp.sif nvcc --version
+apptainer run --nv ./cp2k_2024.1_mpich_generic_cuda_P100_psmp.sif nvcc --version
 ```
 
 to retrieve the CUDA version of the actual container.  With the `run_tests` command
 
 ```
-apptainer run --nv -B $PWD:/mnt ./cp2k_2023.2_mpich_generic_cuda_P100_psmp.sif run_tests
+apptainer run --nv -B $PWD:/mnt ./cp2k_2024.1_mpich_generic_cuda_P100_psmp.sif run_tests
 ```
 
 one can check eventually if the container works correctly and the GPU usage can be monitored on the host system with the `nvidia-smi` command while running.
@@ -91,13 +91,13 @@ one can check eventually if the container works correctly and the GPU usage can 
 The MPI of the container can be employed to run CP2K within a compute node, e.g. using 4 MPI ranks with 2 OpenMP threads each
 
 ```
-apptainer run -B $PWD cp2k_2023.2_mpich_generic_psmp.sif mpiexec -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+apptainer run -B $PWD cp2k_2024.1_mpich_generic_psmp.sif mpiexec -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
 ```
 
 with MPICH and similarly with OpenMPI
 
 ```
-apptainer run -B $PWD cp2k_2023.2_openmpi_generic_psmp.sif mpiexec -n 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+apptainer run -B $PWD cp2k_2024.1_openmpi_generic_psmp.sif mpiexec -n 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
 ```
 
 ### Running MPI outside the container
@@ -106,13 +106,13 @@ For multi-node runs on HPC cluster systems, it is required to use the MPI of the
 
 ```
 export OMP_NUM_THREADS=2
-mpiexec -n 4 apptainer run -B $PWD cp2k_2023.2_mpich_generic_psmp.sif cp2k -i H2O-32.inp
+mpiexec -n 4 apptainer run -B $PWD cp2k_2024.1_mpich_generic_psmp.sif cp2k -i H2O-32.inp
 ```
 
 to achieve best performance, but incompabilities, e.g. because of proprietary drivers or installations, might disable runing the pre-built container with the host MPI. If the host system has installed SLURM as a scheduler, `srun` can (should) be used instead of `mpiexec` (or `mpirun`)
 
 ```
-srun -n 4 apptainer run -B $PWD cp2k_2023.2_mpich_generic_psmp.sif cp2k -i H2O-32.inp
+srun -n 4 apptainer run -B $PWD cp2k_2024.1_mpich_generic_psmp.sif cp2k -i H2O-32.inp
 ```
 
 With SLURM, `srun` is usually the proper way to launch a production run in batch mode using a CP2K `sif` file.
@@ -164,13 +164,13 @@ The flag `-it` keeps the interactive terminal attached which allows for an inter
 The MPI of the container can be employed to run CP2K within a compute node. The containers built with MPICH can be run with
 
 ```
-docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2023.2_mpich_generic_psmp mpirun -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2024.1_mpich_generic_psmp mpirun -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
 ```
 
 whereas the containers built with OpenMPI can be run, e.g. using
 
 ```
-docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2023.2_openmpi_generic_psmp mpirun -bind-to none -np 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2024.1_openmpi_generic_psmp mpirun -bind-to none -np 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
 ```
 
 ### Running CUDA enabled docker containers
@@ -178,11 +178,11 @@ docker run -it --rm --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) 
 After pulling a CUDA enabled CP2K docker container, e.g. for Pascal GPUs (P100), similarly to the [section above](#running-cuda-enabled-containers-with-apptainer), the following docker commands will check
 
 ```
-docker run -it --rm --gpus all cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp nvidia-smi
+docker run -it --rm --gpus all cp2k/cp2k:2024.1_mpich_generic_cuda_P100_psmp nvidia-smi
 
-docker run -it --rm --gpus all cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp nvcc --version
+docker run -it --rm --gpus all cp2k/cp2k:2024.1_mpich_generic_cuda_P100_psmp nvcc --version
 
-docker run -it --rm --gpus all --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2023.2_mpich_generic_cuda_P100_psmp run_tests
+docker run -it --rm --gpus all --shm-size=1g -v $PWD:/mnt -u $(id -u $USER):$(id -g $USER) cp2k/cp2k:2024.1_mpich_generic_cuda_P100_psmp run_tests
 ```
 
 if the container is working correctly.
@@ -199,10 +199,10 @@ All containers provide as further binaries:
 
 ### Building your own CP2K docker container
 
-You can build your own CP2K docker container, e.g. using the Docker file `2023.2_mpich_generic_psmp.Dockerfile` for the CP2K version 2023.2, by running
+You can build your own CP2K docker container, e.g. using the Docker file `2024.1_mpich_generic_psmp.Dockerfile` for the CP2K version 2024.1, by running
 
 ```
-docker build -f ./2023.2_mpich_generic_psmp.Dockerfile -t $USER/cp2k:2023.2_mpich_generic_psmp .
+docker build -f ./2024.1_mpich_generic_psmp.Dockerfile -t $USER/cp2k:2024.1_mpich_generic_psmp .
 ```
 
 or for the current CP2K trunk version (see [master](https://github.com/cp2k/cp2k/tree/master) branch) with
@@ -216,13 +216,13 @@ Each Docker file includes a `Usage` line in its header with the `docker build` c
 If the docker files will include any CP2K regression test during its build, the log file size will be much larger. In that case, it is recommended either to use docker's legacy builder
 
 ```
-DOCKER_BUILDKIT=0 docker build -f ./2023.2_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:2023.2_mpich_generic_psmp .
+DOCKER_BUILDKIT=0 docker build -f ./2024.1_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:2024.1_mpich_generic_psmp .
 ```
 
 or to add the `--progress` flag when using the new docker builder `buildx`, e.g.
 
 ```
-docker buildx build --progress=plain -f ./2023.2_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:2023.2_mpich_generic_psmp .
+docker buildx build --progress=plain -f ./2024.1_mpich_generic_psmp.Dockerfile -t cp2k/cp2k:2024.1_mpich_generic_psmp .
 ```
 
 ### (Re-)Generate the docker files
@@ -230,7 +230,7 @@ docker buildx build --progress=plain -f ./2023.2_mpich_generic_psmp.Dockerfile -
 The Python script [`generate_docker_files`](https://github.com/cp2k/cp2k-containers/blob/master/docker/generate_docker_files.py) generates all docker files in this [folder](https://github.com/cp2k/cp2k-containers/tree/master/docker/) if run without any further option. It provides a few command line options allowing for an adaptation of the created docker files to the actual needs, e.g. with
 
 ```
-./generate_docker_files.py -j 28 --test
+./generate_docker_files.py -j 32 --test
 ```
 
-it will create docker files using 28 instead of the default 8 CPU cores for building the docker containers and the container will run a full CP2K regression test after the container has been built. Run `generate_docker_files -h` for more details about the available options.
+it will create docker files using 32 instead of the default 8 CPU cores for building the docker containers and the container will run a full CP2K regression test after the container has been built. Run `generate_docker_files -h` for more details about the available options.
