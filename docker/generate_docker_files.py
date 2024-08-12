@@ -10,8 +10,11 @@ import os
 
 # ------------------------------------------------------------------------------
 
-cp2k_release_list = ["master", "2023.2", "2024.1"]  # append new releases to list
-mpi_implementation_list = ["intelmpi", "mpich", "openmpi"]
+cp2k_release_list = ["master",
+                     "2023.2",
+                     "2024.1",
+                     "2024.2"]  # append new releases to list
+mpi_implementation_list = ["mpich", "openmpi"]
 target_cpu_list = [
     "generic",
     "haswell",
