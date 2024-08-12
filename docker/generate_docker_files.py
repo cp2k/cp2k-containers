@@ -144,6 +144,7 @@ def main() -> None:
             f"({ncores} > {os.cpu_count()})"
         )
 
+    base_system = "ubuntu:22.04"
     for release in cp2k_release_list:
         if args.release not in ("all", release):
             continue
@@ -152,18 +153,9 @@ def main() -> None:
             if args.mpi_implementation not in ("all", mpi_implementation):
                 continue
 
-            if mpi_implementation == "intelmpi":
-                base_system = "intel/oneapi-hpckit:2023.2.1-devel-ubuntu22.04"
-                if release != "master":
-                    if float(release) <= 2023.2:
-                        continue
-            else:
-                base_system = "ubuntu:22.04"
 
             for target_cpu in target_cpu_list:
                 if args.target_cpu not in ("all", target_cpu):
-                    continue
-                if "znver" in target_cpu and mpi_implementation == "intelmpi":
                     continue
                 if release != "master":
                     if float(release) <= 2023.2 and "znver" in target_cpu:
@@ -193,10 +185,7 @@ def main() -> None:
         if args.release not in ("all", release):
             continue
         for mpi_implementation in mpi_implementation_list:
-            if (
-                args.mpi_implementation not in ("all", mpi_implementation)
-                or mpi_implementation == "intelmpi"
-            ):
+            if (args.mpi_implementation not in ("all", mpi_implementation)):
                 continue
             for target_cpu in target_cpu_list:
                 if args.target_cpu not in ("all", target_cpu):
@@ -303,7 +292,7 @@ ENV CUDA_CACHE_DISABLE 1
         arch = "local"
         cuda_packages = ""
         cuda_environment = ""
-        with_gpu_line = "--enable-cuda=no"
+        with_gpu_line = "--enable-cuda=no --with-libtorch=no"
 
     # Default options for the regression tests
     testopts = f"--maxtasks {ncores}" " --workbasedir /mnt"
@@ -325,12 +314,6 @@ export OMPI_MCA_btl_vader_single_copy_mechanism=none\\n\\\
         required_packages += " openssh-client"
         testopts = '--mpiexec \\"mpiexec --bind-to none\\" ' + testopts
         with_gcc_line = "--with-gcc=system"
-    elif mpi_implementation == "intelmpi":
-        permissive = "; true"
-        with_gcc_line = (
-            "--with-intel=system --with-intelmpi=system "
-            "--with-libtorch=no --with-mkl=system"
-        )
 
     if no_tests:
         install_binaries = rf"""
