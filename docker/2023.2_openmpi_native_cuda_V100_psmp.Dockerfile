@@ -27,7 +27,7 @@ WORKDIR /opt/cp2k/tools/toolchain
 RUN /bin/bash -c -o pipefail \
     "./install_cp2k_toolchain.sh -j 8 \
      --install-all \
-     --enable-cuda=yes --gpu-ver=V100 --with-libtorch=no \
+     --enable-cuda=yes --gpu-ver=V100 --with-deepmd=no --with-libtorch=no \
      --target-cpu=native \
      --with-cusolvermp=no \
      --with-gcc=system \

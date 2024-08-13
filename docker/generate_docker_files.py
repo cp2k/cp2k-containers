@@ -286,13 +286,13 @@ ENV LD_LIBRARY_PATH {cuda_path}/lib64
 # See also https://github.com/cp2k/cp2k/pull/2337
 ENV CUDA_CACHE_DISABLE 1
 """
-        with_gpu_line = f"--enable-cuda=yes --gpu-ver={target_gpu} --with-libtorch=no"
+        with_gpu_line = f"--enable-cuda=yes --gpu-ver={target_gpu} --with-deepmd=no --with-libtorch=no"
     else:
         additional_exports = "\\"
         arch = "local"
         cuda_packages = ""
         cuda_environment = ""
-        with_gpu_line = "--enable-cuda=no --with-libtorch=no"
+        with_gpu_line = "--enable-cuda=no --with-deepmd=no"
 
     # Default options for the regression tests
     testopts = f"--maxtasks {ncores}" " --workbasedir /mnt"

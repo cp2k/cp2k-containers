@@ -20,7 +20,7 @@ WORKDIR /opt/cp2k/tools/toolchain
 RUN /bin/bash -c -o pipefail \
     "./install_cp2k_toolchain.sh -j 8 \
      --install-all \
-     --enable-cuda=no \
+     --enable-cuda=no --with-deepmd=no \
      --target-cpu=skylake-avx512 \
      --with-cusolvermp=no \
      --with-gcc=system \
