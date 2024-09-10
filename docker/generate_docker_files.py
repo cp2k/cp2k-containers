@@ -10,10 +10,13 @@ import os
 
 # ------------------------------------------------------------------------------
 
-cp2k_release_list = ["master",
-                     "2023.2",
-                     "2024.1",
-                     "2024.2"]  # append new releases to list
+cp2k_release_list = [
+    "master",
+    "2023.2",
+    "2024.1",
+    "2024.2",
+    "2024.3",
+]  # append new releases to list
 mpi_implementation_list = ["mpich", "openmpi"]
 target_cpu_list = [
     "generic",
@@ -153,7 +156,6 @@ def main() -> None:
             if args.mpi_implementation not in ("all", mpi_implementation):
                 continue
 
-
             for target_cpu in target_cpu_list:
                 if args.target_cpu not in ("all", target_cpu):
                     continue
@@ -185,7 +187,7 @@ def main() -> None:
         if args.release not in ("all", release):
             continue
         for mpi_implementation in mpi_implementation_list:
-            if (args.mpi_implementation not in ("all", mpi_implementation)):
+            if args.mpi_implementation not in ("all", mpi_implementation):
                 continue
             for target_cpu in target_cpu_list:
                 if args.target_cpu not in ("all", target_cpu):
@@ -286,7 +288,10 @@ ENV LD_LIBRARY_PATH {cuda_path}/lib64
 # See also https://github.com/cp2k/cp2k/pull/2337
 ENV CUDA_CACHE_DISABLE 1
 """
-        with_gpu_line = f"--enable-cuda=yes --gpu-ver={target_gpu} --with-deepmd=no --with-libtorch=no"
+        with_gpu_line = (
+            f"--enable-cuda=yes --gpu-ver={target_gpu} "
+            f"--with-deepmd=no --with-libtorch=no"
+        )
     else:
         additional_exports = "\\"
         arch = "local"
