@@ -16,6 +16,7 @@ cp2k_release_list = [
     "2024.1",
     "2024.2",
     "2024.3",
+    "2025.1",
 ]  # append new releases to list
 mpi_implementation_list = ["mpich", "openmpi"]
 target_cpu_list = [
