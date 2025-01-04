@@ -163,6 +163,10 @@ def main() -> None:
                 if release != "master":
                     if float(release) <= 2023.2 and "znver" in target_cpu:
                         continue
+                if release == "master" or float(release) >= 2025.1:
+                    exe_path = "/opt/cp2k/exe/"
+                else:
+                    exe_path = ""
                 name = f"{release}_{mpi_implementation}_{target_cpu}_{version}"
                 with OutputFile(f"{name}.Dockerfile", args.check) as output_file:
                     output_file.write(
@@ -179,6 +183,7 @@ def main() -> None:
                             target_gpu="",
                             test_build=test_build,
                             user_name=user_name,
+                            exe_path=exe_path,
                         )
                     )
 
@@ -196,6 +201,10 @@ def main() -> None:
                 # Restrict docker file generation for CUDA
                 if target_cpu not in ["generic", "native", args.target_cpu]:
                     continue
+                if release == "master" or float(release) >= 2025.1:
+                    exe_path = "/opt/cp2k/exe/"
+                else:
+                    exe_path = ""
                 for igpu, target_gpu in enumerate(target_gpu_list):
                     if args.target_gpu not in ("all", target_gpu):
                         continue
@@ -221,6 +230,7 @@ def main() -> None:
                                 target_gpu=target_gpu,
                                 test_build=test_build,
                                 user_name=user_name,
+                                exe_path=exe_path,
                             )
                         )
 
@@ -251,6 +261,7 @@ def write_docker_file(
     target_gpu: str,
     test_build: bool,
     user_name: str,
+    exe_path: str,
 ) -> str:
     do_regtest = "/opt/cp2k/tests/do_regtest.py"
 
@@ -349,7 +360,7 @@ COPY --from=build /opt/cp2k/src/grid/sample_tasks/ /opt/cp2k/src/grid/sample_tas
 """
         run_tests = rf"""
 # Create shortcut for regression test
-RUN printf "{do_regtest} {testopts} \$* {arch} {version}" \
+RUN printf "{do_regtest} {testopts} \$* {exe_path}{arch} {version}" \
 >/usr/local/bin/run_tests && chmod 755 /usr/local/bin/run_tests
 """
         required_packages += " python3"

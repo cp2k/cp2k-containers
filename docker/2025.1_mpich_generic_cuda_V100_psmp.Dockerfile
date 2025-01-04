@@ -98,7 +98,7 @@ source /opt/cp2k/tools/toolchain/install/setup\n\
 >/usr/local/bin/entrypoint.sh && chmod 755 /usr/local/bin/entrypoint.sh
 
 # Create shortcut for regression test
-RUN printf "/opt/cp2k/tests/do_regtest.py --maxtasks 8 --workbasedir /mnt \$* local_cuda psmp" \
+RUN printf "/opt/cp2k/tests/do_regtest.py --maxtasks 8 --workbasedir /mnt \$* /opt/cp2k/exe/local_cuda psmp" \
 >/usr/local/bin/run_tests && chmod 755 /usr/local/bin/run_tests
 
 # Define entrypoint

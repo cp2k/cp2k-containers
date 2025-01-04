@@ -12,13 +12,17 @@ else
    return 1
 fi
 docker system prune --all --force
+echo '#!/bin/bash' >push_containers.sh
+echo '#!/bin/bash' >run_containers.sh
 for release in ${releases}; do
    for target in generic haswell skylake-avx512 generic_cuda_P100; do
       for mpi in mpich openmpi; do
          dfname=${release}_${mpi}_${target}_psmp
          DOCKER_BUILDKIT=0 docker build --shm-size=1g -f ./${dfname}.Dockerfile -t cp2k/cp2k:${dfname} . 2>&1 | tee ${dfname}.log
-         #         docker run -it --shm-size=1g -u `id -u $USER`:`id -g $USER` -v $PWD:/mnt cp2k/cp2k:${dfname} run_tests 2>&1 | tee -a ${dfname}.log
-         #         docker push cp2k/cp2k:${dfname}
+         echo 'docker run -it --shm-size=1g -u `id -u $USER`:`id -g $USER` -v $PWD:/mnt' "cp2k/cp2k:${dfname} run_tests" >>run_containers.sh
+         echo "docker push cp2k/cp2k:${dfname}" >>push_containers.sh
       done
    done
 done
+echo '#!/bin/bash' >push_containers_reverse.sh
+tail -n +2 push_containers.sh | tac >>push_containers_reverse.sh
