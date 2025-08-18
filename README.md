@@ -12,7 +12,7 @@ Install the latest [Apptainer](https://apptainer.org/) version as described [her
 
 ### Download a pre-built CP2K docker container with Apptainer
 
-The available pre-built CP2K production docker containers can be found [here](https://hub.docker.com/r/cp2k/cp2k/tags/). The name of a docker container indicates CP2K version, MPI implementation (MPICH or OpenMPI), target CPU (`generic`, `haswell`, or `skylake-avx512`), CUDA support, and cp2k binary version (e.g. `psmp` for MPI parallelized with OpenMP support). If you don't know your CPU model, then try the CPU target `generic` (NEHALEM) first or simply choose `latest`:
+The available pre-built CP2K production docker containers can be found [here](https://hub.docker.com/r/cp2k/cp2k/tags/). The name of a docker container indicates CP2K version, MPI implementation (MPICH or OpenMPI), target CPU (`x86_64`, `cascadelake`, `generic`, `haswell`, or `skylake-avx512`), CUDA support, and cp2k binary version (e.g. `psmp` for MPI parallelized with OpenMP support). If you don't know your CPU model, then try the CPU target `x86_64` or `generic` first or simply choose `latest`:
 
 ```
 apptainer pull docker://cp2k/cp2k:latest
@@ -49,13 +49,13 @@ chmod a+x cp2k_latest.sif
 A more extensive testing, a kind of self-test, can be performed with the `run_tests` command
 
 ```
-apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests
+apptainer run cp2k_latest.sif run_tests --workbasedir .
 ```
 
 which launches a full [CP2K regression test](https://www.cp2k.org/dev:regtesting/) run within the container. The test run will use 8 tasks (CPU cores) by default. If you have more or less CPU cores available, you can set the maximum number of tasks (CPU cores), preferibly a multiple of 4 for this test, with the `--maxtasks` flag
 
 ```
-apptainer run -B $PWD:/mnt cp2k_latest.sif run_tests --maxtasks 32
+apptainer run cp2k_latest.sif run_tests --maxtasks 32 --workbasedir .
 ```
 
 ### Running CUDA enabled containers with Apptainer
@@ -81,7 +81,7 @@ apptainer run --nv ./cp2k_2024.3_mpich_generic_cuda_P100_psmp.sif nvcc --version
 to retrieve the CUDA version of the actual container.  With the `run_tests` command
 
 ```
-apptainer run --nv -B $PWD:/mnt ./cp2k_2024.3_mpich_generic_cuda_P100_psmp.sif run_tests
+apptainer run --nv ./cp2k_2024.3_mpich_generic_cuda_P100_psmp.sif run_tests  --workbasedir .
 ```
 
 one can check eventually if the container works correctly and the GPU usage can be monitored on the host system with the `nvidia-smi` command while running.
@@ -91,14 +91,15 @@ one can check eventually if the container works correctly and the GPU usage can 
 The MPI of the container can be employed to run CP2K within a compute node, e.g. using 4 MPI ranks with 2 OpenMP threads each
 
 ```
-apptainer run -B $PWD cp2k_2024.3_mpich_generic_psmp.sif mpiexec -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+apptainer run -B $PWD cp2k_2024.3_mpich_generic_psmp.sif mpiexec -n 4 -genv OMP_NUM_THREADS=2 cp2k -i H2O-32_md.inp
 ```
 
 with MPICH and similarly with OpenMPI
 
 ```
-apptainer run -B $PWD cp2k_2024.3_openmpi_generic_psmp.sif mpiexec -n 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32.inp
+apptainer run -B $PWD cp2k_2024.3_openmpi_generic_psmp.sif mpiexec -n 4 -x OMP_NUM_THREADS=2 cp2k -i H2O-32_md.inp
 ```
+The test input file `H2O-32_md.inp` can be downloaded [here](https://github.com/cp2k/cp2k/blob/master/benchmarks/CI/H2O-32_md.inp).
 
 ### Running MPI outside the container
 
@@ -106,13 +107,13 @@ For multi-node runs on HPC cluster systems, it is required to use the MPI of the
 
 ```
 export OMP_NUM_THREADS=2
-mpiexec -n 4 apptainer run -B $PWD cp2k_2024.3_mpich_generic_psmp.sif cp2k -i H2O-32.inp
+mpiexec -n 4 apptainer run -B $PWD cp2k_2024.3_mpich_generic_psmp.sif cp2k -i H2O-32_md.inp
 ```
 
 to achieve best performance, but incompabilities, e.g. because of proprietary drivers or installations, might disable runing the pre-built container with the host MPI. If the host system has installed SLURM as a scheduler, `srun` can (should) be used instead of `mpiexec` (or `mpirun`)
 
 ```
-srun -n 4 apptainer run -B $PWD cp2k_2024.3_mpich_generic_psmp.sif cp2k -i H2O-32.inp
+srun -n 4 apptainer run -B $PWD cp2k_2024.3_mpich_generic_psmp.sif cp2k -i H2O-32_md.inp
 ```
 
 With SLURM, `srun` is usually the proper way to launch a production run in batch mode using a CP2K `sif` file.
