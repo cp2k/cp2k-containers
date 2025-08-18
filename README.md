@@ -18,7 +18,7 @@ The available pre-built CP2K production docker containers can be found [here](ht
 apptainer pull docker://cp2k/cp2k:latest
 ```
 
-which will download the `mpich_generic_psmp` image of the latest CP2K release version. 
+which will download the container for the latest CP2K release version built with MPICH for `x86_64` (generic).
 
 ### Run CP2K with Apptainer
 
