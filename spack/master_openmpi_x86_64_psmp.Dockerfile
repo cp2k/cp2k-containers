@@ -154,7 +154,10 @@ WORKDIR /opt/cp2k/bin
 RUN CP2K_VERSION=$(cat /CP2K_VERSION) && \
     ln -sf cp2k.${CP2K_VERSION} cp2k && \
     ln -sf cp2k.${CP2K_VERSION} cp2k.$(echo ${CP2K_VERSION} | sed "s/smp/opt/") && \
-    ln -sf cp2k.${CP2K_VERSION} cp2k_shell
+    ln -sf cp2k.${CP2K_VERSION} cp2k_shell && \
+    ln -sf dumpdcd.${CP2K_VERSION} dumpdcd && \
+    ln -sf graph.${CP2K_VERSION} graph && \
+    ln -sf xyz2dcd.${CP2K_VERSION} xyz2dcd
 
 # Update library search path
 RUN echo "/opt/cp2k/lib\n/opt/spack/lib\n$(dirname $(find /opt/spack/lib -name libtorch.so 2>/dev/null || true) 2>/dev/null || true)" >/etc/ld.so.conf.d/cp2k.conf && ldconfig
