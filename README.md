@@ -1,5 +1,8 @@
 # CP2K containers
 
+> [!NOTE]
+> Starting with the **CP2K release v2026.2**, dockerfiles files for building CP2K containers with `podman` are directly included in the CP2K repository under [`cp2k/tools/docker`](https://github.com/cp2k/cp2k/tree/master/tools/docker). Select one of the `Dockerfile.test_spack_*` files like `Dockerfile.test_spack_psmp-gcc15` to build a docker container with an MPI/OpenMP CP2K production binary using the GCC 15 compiler. Each dockerfile provides a usage description in its header.
+
 CP2K docker containers are suited for many host systems. A convenient way to use them is to run such a container with [Apptainer](https://apptainer.org/) which is described in the following sections. Further down, you will find the information how to run and build CP2K production containers with [docker](https://docs.docker.com/).
 
 ## Apptainer (Singularity)
